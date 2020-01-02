@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.kotlin.multiplatform" version "1.3.50"
+    id "org.jetbrains.kotlin.multiplatform" version "1.3.61"
 }
 
 ext.applicationName = "kavanmevada"
@@ -42,7 +42,7 @@ kotlin {
             }
 
             libcurl {
-                includeDirs "/usr/include/"
+                includeDirs "/usr/include/","/usr/bin/"
             }
 
             glibjson {
@@ -70,7 +70,7 @@ kotlin {
             resources.exclude '**/*'
             dependencies {
                 //implementation fileTree(include: ['*.klib'], dir: 'libs')
-                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.2'
+                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3'
                 //implementation "io.ktor:ktor-client-curl-linuxx64:1.2.3"
             }
         }
@@ -127,7 +127,6 @@ build {
 
 
     exec { executable 'echo' args 'Helloworld' }
-
     exec {
         workingDir "$buildDir/g_resources"
         executable 'glib-compile-resources' args "glibresources.gresource.xml", "--generate-source", "--target=glibresources.c"

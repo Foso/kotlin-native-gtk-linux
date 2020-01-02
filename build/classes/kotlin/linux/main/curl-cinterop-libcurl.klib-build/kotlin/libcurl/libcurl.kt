@@ -5,7 +5,6 @@ package libcurl
 import kotlin.native.SymbolName
 import kotlinx.cinterop.internal.*
 import kotlinx.cinterop.*
-import cnames.structs.Curl_URL
 import cnames.structs.curl_mime_s
 import cnames.structs.curl_mimepart_s
 import cnames.structs.curl_pushheaders
@@ -285,10 +284,10 @@ class curl_tlssessioninfo(rawPtr: NativePtr) : CStructVar(rawPtr) {
         set(value) { memberAt<COpaquePointerVar>(8).value = value }
 }
 
-@CStruct("struct { unsigned int p0; void* p1; unsigned int p2; void* p3; int p4; void* p5; long p6; void* p7; void* p8; void* p9; int p10; void* p11; int p12; void* p13; unsigned int p14; void* p15; unsigned int p16; void* p17; void* p18; }")
+@CStruct("struct { unsigned int p0; void* p1; unsigned int p2; void* p3; int p4; void* p5; long p6; void* p7; void* p8; void* p9; int p10; void* p11; int p12; void* p13; unsigned int p14; void* p15; }")
 class curl_version_info_data(rawPtr: NativePtr) : CStructVar(rawPtr) {
     
-    companion object : Type(152, 8)
+    companion object : Type(128, 8)
     
     var age: CURLversion
         get() = memberAt<CURLversion.Var>(0).value
@@ -353,18 +352,6 @@ class curl_version_info_data(rawPtr: NativePtr) : CStructVar(rawPtr) {
     var brotli_version: CPointer<ByteVar>?
         get() = memberAt<CPointerVar<ByteVar>>(120).value
         set(value) { memberAt<CPointerVar<ByteVar>>(120).value = value }
-    
-    var nghttp2_ver_num: UInt
-        get() = memberAt<UIntVar>(128).value
-        set(value) { memberAt<UIntVar>(128).value = value }
-    
-    var nghttp2_version: CPointer<ByteVar>?
-        get() = memberAt<CPointerVar<ByteVar>>(136).value
-        set(value) { memberAt<CPointerVar<ByteVar>>(136).value = value }
-    
-    var quic_version: CPointer<ByteVar>?
-        get() = memberAt<CPointerVar<ByteVar>>(144).value
-        set(value) { memberAt<CPointerVar<ByteVar>>(144).value = value }
 }
 
 @CStruct("struct { unsigned int p0; void* p1; union { void* p0; unsigned int p1; } p2; }")
@@ -846,8 +833,7 @@ enum class CURLversion(override val value: UInt) : CEnum {
     CURLVERSION_THIRD(2u),
     CURLVERSION_FOURTH(3u),
     CURLVERSION_FIFTH(4u),
-    CURLVERSION_SIXTH(5u),
-    CURLVERSION_LAST(6u),
+    CURLVERSION_LAST(5u),
     ;
     
     companion object {
@@ -882,467 +868,211 @@ enum class CURLMSG(override val value: UInt) : CEnum {
     }
 }
 
-enum class CURLUcode(override val value: UInt) : CEnum {
-    CURLUE_OK(0u),
-    CURLUE_BAD_HANDLE(1u),
-    CURLUE_BAD_PARTPOINTER(2u),
-    CURLUE_MALFORMED_INPUT(3u),
-    CURLUE_BAD_PORT_NUMBER(4u),
-    CURLUE_UNSUPPORTED_SCHEME(5u),
-    CURLUE_URLDECODE(6u),
-    CURLUE_OUT_OF_MEMORY(7u),
-    CURLUE_USER_NOT_ALLOWED(8u),
-    CURLUE_UNKNOWN_PART(9u),
-    CURLUE_NO_SCHEME(10u),
-    CURLUE_NO_USER(11u),
-    CURLUE_NO_PASSWORD(12u),
-    CURLUE_NO_OPTIONS(13u),
-    CURLUE_NO_HOST(14u),
-    CURLUE_NO_PORT(15u),
-    CURLUE_NO_QUERY(16u),
-    CURLUE_NO_FRAGMENT(17u),
-    ;
-    
-    companion object {
-        
-        fun byValue(value: UInt) = CURLUcode.values().find { it.value == value }!!
-    }
-    
-    class Var(rawPtr: NativePtr) : CEnumVar(rawPtr) {
-        companion object : Type(UIntVar.size.toInt())
-        var value: CURLUcode
-            get() = byValue(this.reinterpret<UIntVar>().value)
-            set(value) { this.reinterpret<UIntVar>().value = value.value }
-    }
-}
+@CCall("knifunptr_libcurl0_curl_strequal")
+external fun curl_strequal(@CCall.CString s1: String?, @CCall.CString s2: String?): Int
 
-enum class CURLUPart(override val value: UInt) : CEnum {
-    CURLUPART_URL(0u),
-    CURLUPART_SCHEME(1u),
-    CURLUPART_USER(2u),
-    CURLUPART_PASSWORD(3u),
-    CURLUPART_OPTIONS(4u),
-    CURLUPART_HOST(5u),
-    CURLUPART_PORT(6u),
-    CURLUPART_PATH(7u),
-    CURLUPART_QUERY(8u),
-    CURLUPART_FRAGMENT(9u),
-    CURLUPART_ZONEID(10u),
-    ;
-    
-    companion object {
-        
-        fun byValue(value: UInt) = CURLUPart.values().find { it.value == value }!!
-    }
-    
-    class Var(rawPtr: NativePtr) : CEnumVar(rawPtr) {
-        companion object : Type(UIntVar.size.toInt())
-        var value: CURLUPart
-            get() = byValue(this.reinterpret<UIntVar>().value)
-            set(value) { this.reinterpret<UIntVar>().value = value.value }
-    }
-}
+@CCall("knifunptr_libcurl1_curl_strnequal")
+external fun curl_strnequal(@CCall.CString s1: String?, @CCall.CString s2: String?, n: size_t): Int
 
-fun curl_strequal(@CCall.CString s1: String?, @CCall.CString s2: String?): Int {
-    memScoped {
-        return kniBridge0(s1?.cstr?.getPointer(memScope).rawValue, s2?.cstr?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl2_curl_mime_init")
+external fun curl_mime_init(easy: CValuesRef<*>?): CPointer<curl_mime>?
 
-fun curl_strnequal(@CCall.CString s1: String?, @CCall.CString s2: String?, n: size_t): Int {
-    memScoped {
-        return kniBridge1(s1?.cstr?.getPointer(memScope).rawValue, s2?.cstr?.getPointer(memScope).rawValue, n)
-    }
-}
+@CCall("knifunptr_libcurl3_curl_mime_free")
+external fun curl_mime_free(mime: CValuesRef<curl_mime>?): Unit
 
-fun curl_mime_init(easy: CValuesRef<*>?): CPointer<curl_mime>? {
-    memScoped {
-        return interpretCPointer<curl_mime>(kniBridge2(easy?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl4_curl_mime_addpart")
+external fun curl_mime_addpart(mime: CValuesRef<curl_mime>?): CPointer<curl_mimepart>?
 
-fun curl_mime_free(mime: CValuesRef<curl_mime>?): Unit {
-    memScoped {
-        return kniBridge3(mime?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl5_curl_mime_name")
+external fun curl_mime_name(part: CValuesRef<curl_mimepart>?, @CCall.CString name: String?): CURLcode
 
-fun curl_mime_addpart(mime: CValuesRef<curl_mime>?): CPointer<curl_mimepart>? {
-    memScoped {
-        return interpretCPointer<curl_mimepart>(kniBridge4(mime?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl6_curl_mime_filename")
+external fun curl_mime_filename(part: CValuesRef<curl_mimepart>?, @CCall.CString filename: String?): CURLcode
 
-fun curl_mime_name(part: CValuesRef<curl_mimepart>?, @CCall.CString name: String?): CURLcode {
-    memScoped {
-        return kniBridge5(part?.getPointer(memScope).rawValue, name?.cstr?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl7_curl_mime_type")
+external fun curl_mime_type(part: CValuesRef<curl_mimepart>?, @CCall.CString mimetype: String?): CURLcode
 
-fun curl_mime_filename(part: CValuesRef<curl_mimepart>?, @CCall.CString filename: String?): CURLcode {
-    memScoped {
-        return kniBridge6(part?.getPointer(memScope).rawValue, filename?.cstr?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl8_curl_mime_encoder")
+external fun curl_mime_encoder(part: CValuesRef<curl_mimepart>?, @CCall.CString encoding: String?): CURLcode
 
-fun curl_mime_type(part: CValuesRef<curl_mimepart>?, @CCall.CString mimetype: String?): CURLcode {
-    memScoped {
-        return kniBridge7(part?.getPointer(memScope).rawValue, mimetype?.cstr?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl9_curl_mime_data")
+external fun curl_mime_data(part: CValuesRef<curl_mimepart>?, @CCall.CString data: String?, datasize: size_t): CURLcode
 
-fun curl_mime_encoder(part: CValuesRef<curl_mimepart>?, @CCall.CString encoding: String?): CURLcode {
-    memScoped {
-        return kniBridge8(part?.getPointer(memScope).rawValue, encoding?.cstr?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl10_curl_mime_filedata")
+external fun curl_mime_filedata(part: CValuesRef<curl_mimepart>?, @CCall.CString filename: String?): CURLcode
 
-fun curl_mime_data(part: CValuesRef<curl_mimepart>?, @CCall.CString data: String?, datasize: size_t): CURLcode {
-    memScoped {
-        return kniBridge9(part?.getPointer(memScope).rawValue, data?.cstr?.getPointer(memScope).rawValue, datasize)
-    }
-}
+@CCall("knifunptr_libcurl11_curl_mime_data_cb")
+external fun curl_mime_data_cb(part: CValuesRef<curl_mimepart>?, datasize: curl_off_t, readfunc: curl_read_callback?, seekfunc: curl_seek_callback?, freefunc: curl_free_callback?, arg: CValuesRef<*>?): CURLcode
 
-fun curl_mime_filedata(part: CValuesRef<curl_mimepart>?, @CCall.CString filename: String?): CURLcode {
-    memScoped {
-        return kniBridge10(part?.getPointer(memScope).rawValue, filename?.cstr?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl12_curl_mime_subparts")
+external fun curl_mime_subparts(part: CValuesRef<curl_mimepart>?, subparts: CValuesRef<curl_mime>?): CURLcode
 
-fun curl_mime_data_cb(part: CValuesRef<curl_mimepart>?, datasize: curl_off_t, readfunc: curl_read_callback?, seekfunc: curl_seek_callback?, freefunc: curl_free_callback?, arg: CValuesRef<*>?): CURLcode {
-    memScoped {
-        return kniBridge11(part?.getPointer(memScope).rawValue, datasize, readfunc.rawValue, seekfunc.rawValue, freefunc.rawValue, arg?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl13_curl_mime_headers")
+external fun curl_mime_headers(part: CValuesRef<curl_mimepart>?, headers: CValuesRef<curl_slist>?, take_ownership: Int): CURLcode
 
-fun curl_mime_subparts(part: CValuesRef<curl_mimepart>?, subparts: CValuesRef<curl_mime>?): CURLcode {
-    memScoped {
-        return kniBridge12(part?.getPointer(memScope).rawValue, subparts?.getPointer(memScope).rawValue)
-    }
-}
-
-fun curl_mime_headers(part: CValuesRef<curl_mimepart>?, headers: CValuesRef<curl_slist>?, take_ownership: Int): CURLcode {
-    memScoped {
-        return kniBridge13(part?.getPointer(memScope).rawValue, headers?.getPointer(memScope).rawValue, take_ownership)
-    }
-}
-
-@CCall("knifunptr_libcurl0")
+@CCall("knifunptr_libcurl14_curl_formadd")
 external fun curl_formadd(httppost: CValuesRef<CPointerVar<curl_httppost>>?, last_post: CValuesRef<CPointerVar<curl_httppost>>?, vararg variadicArguments: Any?): CURLFORMcode
 
-fun curl_formget(form: CValuesRef<curl_httppost>?, arg: CValuesRef<*>?, append: curl_formget_callback?): Int {
-    memScoped {
-        return kniBridge14(form?.getPointer(memScope).rawValue, arg?.getPointer(memScope).rawValue, append.rawValue)
-    }
-}
+@CCall("knifunptr_libcurl15_curl_formget")
+external fun curl_formget(form: CValuesRef<curl_httppost>?, arg: CValuesRef<*>?, append: curl_formget_callback?): Int
 
-fun curl_formfree(form: CValuesRef<curl_httppost>?): Unit {
-    memScoped {
-        return kniBridge15(form?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl16_curl_formfree")
+external fun curl_formfree(form: CValuesRef<curl_httppost>?): Unit
 
-fun curl_getenv(@CCall.CString variable: String?): CPointer<ByteVar>? {
-    memScoped {
-        return interpretCPointer<ByteVar>(kniBridge16(variable?.cstr?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl17_curl_getenv")
+external fun curl_getenv(@CCall.CString variable: String?): CPointer<ByteVar>?
 
-fun curl_version(): CPointer<ByteVar>? {
-    return interpretCPointer<ByteVar>(kniBridge17())
-}
+@CCall("knifunptr_libcurl18_curl_version")
+external fun curl_version(): CPointer<ByteVar>?
 
-fun curl_easy_escape(handle: CValuesRef<*>?, @CCall.CString string: String?, length: Int): CPointer<ByteVar>? {
-    memScoped {
-        return interpretCPointer<ByteVar>(kniBridge18(handle?.getPointer(memScope).rawValue, string?.cstr?.getPointer(memScope).rawValue, length))
-    }
-}
+@CCall("knifunptr_libcurl19_curl_easy_escape")
+external fun curl_easy_escape(handle: CValuesRef<*>?, @CCall.CString string: String?, length: Int): CPointer<ByteVar>?
 
-fun curl_escape(@CCall.CString string: String?, length: Int): CPointer<ByteVar>? {
-    memScoped {
-        return interpretCPointer<ByteVar>(kniBridge19(string?.cstr?.getPointer(memScope).rawValue, length))
-    }
-}
+@CCall("knifunptr_libcurl20_curl_escape")
+external fun curl_escape(@CCall.CString string: String?, length: Int): CPointer<ByteVar>?
 
-fun curl_easy_unescape(handle: CValuesRef<*>?, @CCall.CString string: String?, length: Int, outlength: CValuesRef<IntVar>?): CPointer<ByteVar>? {
-    memScoped {
-        return interpretCPointer<ByteVar>(kniBridge20(handle?.getPointer(memScope).rawValue, string?.cstr?.getPointer(memScope).rawValue, length, outlength?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl21_curl_easy_unescape")
+external fun curl_easy_unescape(handle: CValuesRef<*>?, @CCall.CString string: String?, length: Int, outlength: CValuesRef<IntVar>?): CPointer<ByteVar>?
 
-fun curl_unescape(@CCall.CString string: String?, length: Int): CPointer<ByteVar>? {
-    memScoped {
-        return interpretCPointer<ByteVar>(kniBridge21(string?.cstr?.getPointer(memScope).rawValue, length))
-    }
-}
+@CCall("knifunptr_libcurl22_curl_unescape")
+external fun curl_unescape(@CCall.CString string: String?, length: Int): CPointer<ByteVar>?
 
-fun curl_free(p: CValuesRef<*>?): Unit {
-    memScoped {
-        return kniBridge22(p?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl23_curl_free")
+external fun curl_free(p: CValuesRef<*>?): Unit
 
-fun curl_global_init(flags: Long): CURLcode {
-    return kniBridge23(flags)
-}
+@CCall("knifunptr_libcurl24_curl_global_init")
+external fun curl_global_init(flags: Long): CURLcode
 
-fun curl_global_init_mem(flags: Long, m: curl_malloc_callback?, f: curl_free_callback?, r: curl_realloc_callback?, s: curl_strdup_callback?, c: curl_calloc_callback?): CURLcode {
-    return kniBridge24(flags, m.rawValue, f.rawValue, r.rawValue, s.rawValue, c.rawValue)
-}
+@CCall("knifunptr_libcurl25_curl_global_init_mem")
+external fun curl_global_init_mem(flags: Long, m: curl_malloc_callback?, f: curl_free_callback?, r: curl_realloc_callback?, s: curl_strdup_callback?, c: curl_calloc_callback?): CURLcode
 
-fun curl_global_cleanup(): Unit {
-    return kniBridge25()
-}
+@CCall("knifunptr_libcurl26_curl_global_cleanup")
+external fun curl_global_cleanup(): Unit
 
-fun curl_global_sslset(id: curl_sslbackend, @CCall.CString name: String?, avail: CValuesRef<CPointerVar<CPointerVar<curl_ssl_backend>>>?): CURLsslset {
-    memScoped {
-        return kniBridge26(id, name?.cstr?.getPointer(memScope).rawValue, avail?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl27_curl_global_sslset")
+external fun curl_global_sslset(id: curl_sslbackend, @CCall.CString name: String?, avail: CValuesRef<CPointerVar<CPointerVar<curl_ssl_backend>>>?): CURLsslset
 
-fun curl_slist_append(arg0: CValuesRef<curl_slist>?, @CCall.CString arg1: String?): CPointer<curl_slist>? {
-    memScoped {
-        return interpretCPointer<curl_slist>(kniBridge27(arg0?.getPointer(memScope).rawValue, arg1?.cstr?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl28_curl_slist_append")
+external fun curl_slist_append(arg0: CValuesRef<curl_slist>?, @CCall.CString arg1: String?): CPointer<curl_slist>?
 
-fun curl_slist_free_all(arg0: CValuesRef<curl_slist>?): Unit {
-    memScoped {
-        return kniBridge28(arg0?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl29_curl_slist_free_all")
+external fun curl_slist_free_all(arg0: CValuesRef<curl_slist>?): Unit
 
-fun curl_getdate(@CCall.CString p: String?, unused: CValuesRef<time_tVar>?): time_t {
-    memScoped {
-        return kniBridge29(p?.cstr?.getPointer(memScope).rawValue, unused?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl30_curl_getdate")
+external fun curl_getdate(@CCall.CString p: String?, unused: CValuesRef<time_tVar>?): time_t
 
-fun curl_share_init(): COpaquePointer? {
-    return interpretCPointer<COpaque>(kniBridge30())
-}
+@CCall("knifunptr_libcurl31_curl_share_init")
+external fun curl_share_init(): COpaquePointer?
 
-@CCall("knifunptr_libcurl1")
+@CCall("knifunptr_libcurl32_curl_share_setopt")
 external fun curl_share_setopt(arg0: CValuesRef<*>?, option: CURLSHoption, vararg variadicArguments: Any?): CURLSHcode
 
-fun curl_share_cleanup(arg0: CValuesRef<*>?): CURLSHcode {
-    memScoped {
-        return CURLSHcode.byValue(kniBridge31(arg0?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl33_curl_share_cleanup")
+external fun curl_share_cleanup(arg0: CValuesRef<*>?): CURLSHcode
 
-fun curl_version_info(arg0: CURLversion): CPointer<curl_version_info_data>? {
-    return interpretCPointer<curl_version_info_data>(kniBridge32(arg0.value))
-}
+@CCall("knifunptr_libcurl34_curl_version_info")
+external fun curl_version_info(arg0: CURLversion): CPointer<curl_version_info_data>?
 
-fun curl_easy_strerror(arg0: CURLcode): CPointer<ByteVar>? {
-    return interpretCPointer<ByteVar>(kniBridge33(arg0))
-}
+@CCall("knifunptr_libcurl35_curl_easy_strerror")
+external fun curl_easy_strerror(arg0: CURLcode): CPointer<ByteVar>?
 
-fun curl_share_strerror(arg0: CURLSHcode): CPointer<ByteVar>? {
-    return interpretCPointer<ByteVar>(kniBridge34(arg0.value))
-}
+@CCall("knifunptr_libcurl36_curl_share_strerror")
+external fun curl_share_strerror(arg0: CURLSHcode): CPointer<ByteVar>?
 
-fun curl_easy_pause(handle: CValuesRef<*>?, bitmask: Int): CURLcode {
-    memScoped {
-        return kniBridge35(handle?.getPointer(memScope).rawValue, bitmask)
-    }
-}
+@CCall("knifunptr_libcurl37_curl_easy_pause")
+external fun curl_easy_pause(handle: CValuesRef<*>?, bitmask: Int): CURLcode
 
-fun curl_easy_init(): COpaquePointer? {
-    return interpretCPointer<COpaque>(kniBridge36())
-}
+@CCall("knifunptr_libcurl38_curl_easy_init")
+external fun curl_easy_init(): COpaquePointer?
 
-@CCall("knifunptr_libcurl2")
+@CCall("knifunptr_libcurl39_curl_easy_setopt")
 external fun curl_easy_setopt(curl: CValuesRef<*>?, option: CURLoption, vararg variadicArguments: Any?): CURLcode
 
-fun curl_easy_perform(curl: CValuesRef<*>?): CURLcode {
-    memScoped {
-        return kniBridge37(curl?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl40_curl_easy_perform")
+external fun curl_easy_perform(curl: CValuesRef<*>?): CURLcode
 
-fun curl_easy_cleanup(curl: CValuesRef<*>?): Unit {
-    memScoped {
-        return kniBridge38(curl?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl41_curl_easy_cleanup")
+external fun curl_easy_cleanup(curl: CValuesRef<*>?): Unit
 
-@CCall("knifunptr_libcurl3")
+@CCall("knifunptr_libcurl42_curl_easy_getinfo")
 external fun curl_easy_getinfo(curl: CValuesRef<*>?, info: CURLINFO, vararg variadicArguments: Any?): CURLcode
 
-fun curl_easy_duphandle(curl: CValuesRef<*>?): COpaquePointer? {
-    memScoped {
-        return interpretCPointer<COpaque>(kniBridge39(curl?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl43_curl_easy_duphandle")
+external fun curl_easy_duphandle(curl: CValuesRef<*>?): COpaquePointer?
 
-fun curl_easy_reset(curl: CValuesRef<*>?): Unit {
-    memScoped {
-        return kniBridge40(curl?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl44_curl_easy_reset")
+external fun curl_easy_reset(curl: CValuesRef<*>?): Unit
 
-fun curl_easy_recv(curl: CValuesRef<*>?, buffer: CValuesRef<*>?, buflen: size_t, n: CValuesRef<size_tVar>?): CURLcode {
-    memScoped {
-        return kniBridge41(curl?.getPointer(memScope).rawValue, buffer?.getPointer(memScope).rawValue, buflen, n?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl45_curl_easy_recv")
+external fun curl_easy_recv(curl: CValuesRef<*>?, buffer: CValuesRef<*>?, buflen: size_t, n: CValuesRef<size_tVar>?): CURLcode
 
-fun curl_easy_send(curl: CValuesRef<*>?, buffer: CValuesRef<*>?, buflen: size_t, n: CValuesRef<size_tVar>?): CURLcode {
-    memScoped {
-        return kniBridge42(curl?.getPointer(memScope).rawValue, buffer?.getPointer(memScope).rawValue, buflen, n?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl46_curl_easy_send")
+external fun curl_easy_send(curl: CValuesRef<*>?, buffer: CValuesRef<*>?, buflen: size_t, n: CValuesRef<size_tVar>?): CURLcode
 
-fun curl_easy_upkeep(curl: CValuesRef<*>?): CURLcode {
-    memScoped {
-        return kniBridge43(curl?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl47_curl_multi_init")
+external fun curl_multi_init(): COpaquePointer?
 
-fun curl_multi_init(): COpaquePointer? {
-    return interpretCPointer<COpaque>(kniBridge44())
-}
+@CCall("knifunptr_libcurl48_curl_multi_add_handle")
+external fun curl_multi_add_handle(multi_handle: CValuesRef<*>?, curl_handle: CValuesRef<*>?): CURLMcode
 
-fun curl_multi_add_handle(multi_handle: CValuesRef<*>?, curl_handle: CValuesRef<*>?): CURLMcode {
-    memScoped {
-        return kniBridge45(multi_handle?.getPointer(memScope).rawValue, curl_handle?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl49_curl_multi_remove_handle")
+external fun curl_multi_remove_handle(multi_handle: CValuesRef<*>?, curl_handle: CValuesRef<*>?): CURLMcode
 
-fun curl_multi_remove_handle(multi_handle: CValuesRef<*>?, curl_handle: CValuesRef<*>?): CURLMcode {
-    memScoped {
-        return kniBridge46(multi_handle?.getPointer(memScope).rawValue, curl_handle?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl50_curl_multi_fdset")
+external fun curl_multi_fdset(multi_handle: CValuesRef<*>?, read_fd_set: CValuesRef<fd_set>?, write_fd_set: CValuesRef<fd_set>?, exc_fd_set: CValuesRef<fd_set>?, max_fd: CValuesRef<IntVar>?): CURLMcode
 
-fun curl_multi_fdset(multi_handle: CValuesRef<*>?, read_fd_set: CValuesRef<fd_set>?, write_fd_set: CValuesRef<fd_set>?, exc_fd_set: CValuesRef<fd_set>?, max_fd: CValuesRef<IntVar>?): CURLMcode {
-    memScoped {
-        return kniBridge47(multi_handle?.getPointer(memScope).rawValue, read_fd_set?.getPointer(memScope).rawValue, write_fd_set?.getPointer(memScope).rawValue, exc_fd_set?.getPointer(memScope).rawValue, max_fd?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl51_curl_multi_wait")
+external fun curl_multi_wait(multi_handle: CValuesRef<*>?, extra_fds: CValuesRef<curl_waitfd>?, extra_nfds: UInt, timeout_ms: Int, ret: CValuesRef<IntVar>?): CURLMcode
 
-fun curl_multi_wait(multi_handle: CValuesRef<*>?, extra_fds: CValuesRef<curl_waitfd>?, extra_nfds: UInt, timeout_ms: Int, ret: CValuesRef<IntVar>?): CURLMcode {
-    memScoped {
-        return kniBridge48(multi_handle?.getPointer(memScope).rawValue, extra_fds?.getPointer(memScope).rawValue, extra_nfds, timeout_ms, ret?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl52_curl_multi_perform")
+external fun curl_multi_perform(multi_handle: CValuesRef<*>?, running_handles: CValuesRef<IntVar>?): CURLMcode
 
-fun curl_multi_poll(multi_handle: CValuesRef<*>?, extra_fds: CValuesRef<curl_waitfd>?, extra_nfds: UInt, timeout_ms: Int, ret: CValuesRef<IntVar>?): CURLMcode {
-    memScoped {
-        return kniBridge49(multi_handle?.getPointer(memScope).rawValue, extra_fds?.getPointer(memScope).rawValue, extra_nfds, timeout_ms, ret?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl53_curl_multi_cleanup")
+external fun curl_multi_cleanup(multi_handle: CValuesRef<*>?): CURLMcode
 
-fun curl_multi_perform(multi_handle: CValuesRef<*>?, running_handles: CValuesRef<IntVar>?): CURLMcode {
-    memScoped {
-        return kniBridge50(multi_handle?.getPointer(memScope).rawValue, running_handles?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl54_curl_multi_info_read")
+external fun curl_multi_info_read(multi_handle: CValuesRef<*>?, msgs_in_queue: CValuesRef<IntVar>?): CPointer<CURLMsg>?
 
-fun curl_multi_cleanup(multi_handle: CValuesRef<*>?): CURLMcode {
-    memScoped {
-        return kniBridge51(multi_handle?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl55_curl_multi_strerror")
+external fun curl_multi_strerror(arg0: CURLMcode): CPointer<ByteVar>?
 
-fun curl_multi_info_read(multi_handle: CValuesRef<*>?, msgs_in_queue: CValuesRef<IntVar>?): CPointer<CURLMsg>? {
-    memScoped {
-        return interpretCPointer<CURLMsg>(kniBridge52(multi_handle?.getPointer(memScope).rawValue, msgs_in_queue?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl56_curl_multi_socket")
+external fun curl_multi_socket(multi_handle: CValuesRef<*>?, s: curl_socket_t, running_handles: CValuesRef<IntVar>?): CURLMcode
 
-fun curl_multi_strerror(arg0: CURLMcode): CPointer<ByteVar>? {
-    return interpretCPointer<ByteVar>(kniBridge53(arg0))
-}
+@CCall("knifunptr_libcurl57_curl_multi_socket_action")
+external fun curl_multi_socket_action(multi_handle: CValuesRef<*>?, s: curl_socket_t, ev_bitmask: Int, running_handles: CValuesRef<IntVar>?): CURLMcode
 
-fun curl_multi_socket(multi_handle: CValuesRef<*>?, s: curl_socket_t, running_handles: CValuesRef<IntVar>?): CURLMcode {
-    memScoped {
-        return kniBridge54(multi_handle?.getPointer(memScope).rawValue, s, running_handles?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl58_curl_multi_socket_all")
+external fun curl_multi_socket_all(multi_handle: CValuesRef<*>?, running_handles: CValuesRef<IntVar>?): CURLMcode
 
-fun curl_multi_socket_action(multi_handle: CValuesRef<*>?, s: curl_socket_t, ev_bitmask: Int, running_handles: CValuesRef<IntVar>?): CURLMcode {
-    memScoped {
-        return kniBridge55(multi_handle?.getPointer(memScope).rawValue, s, ev_bitmask, running_handles?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl59_curl_multi_timeout")
+external fun curl_multi_timeout(multi_handle: CValuesRef<*>?, milliseconds: CValuesRef<LongVar>?): CURLMcode
 
-fun curl_multi_socket_all(multi_handle: CValuesRef<*>?, running_handles: CValuesRef<IntVar>?): CURLMcode {
-    memScoped {
-        return kniBridge56(multi_handle?.getPointer(memScope).rawValue, running_handles?.getPointer(memScope).rawValue)
-    }
-}
-
-fun curl_multi_timeout(multi_handle: CValuesRef<*>?, milliseconds: CValuesRef<LongVar>?): CURLMcode {
-    memScoped {
-        return kniBridge57(multi_handle?.getPointer(memScope).rawValue, milliseconds?.getPointer(memScope).rawValue)
-    }
-}
-
-@CCall("knifunptr_libcurl4")
+@CCall("knifunptr_libcurl60_curl_multi_setopt")
 external fun curl_multi_setopt(multi_handle: CValuesRef<*>?, option: CURLMoption, vararg variadicArguments: Any?): CURLMcode
 
-fun curl_multi_assign(multi_handle: CValuesRef<*>?, sockfd: curl_socket_t, sockp: CValuesRef<*>?): CURLMcode {
-    memScoped {
-        return kniBridge58(multi_handle?.getPointer(memScope).rawValue, sockfd, sockp?.getPointer(memScope).rawValue)
-    }
-}
+@CCall("knifunptr_libcurl61_curl_multi_assign")
+external fun curl_multi_assign(multi_handle: CValuesRef<*>?, sockfd: curl_socket_t, sockp: CValuesRef<*>?): CURLMcode
 
-fun curl_pushheader_bynum(h: CValuesRef<curl_pushheaders>?, num: size_t): CPointer<ByteVar>? {
-    memScoped {
-        return interpretCPointer<ByteVar>(kniBridge59(h?.getPointer(memScope).rawValue, num))
-    }
-}
+@CCall("knifunptr_libcurl62_curl_pushheader_bynum")
+external fun curl_pushheader_bynum(h: CValuesRef<curl_pushheaders>?, num: size_t): CPointer<ByteVar>?
 
-fun curl_pushheader_byname(h: CValuesRef<curl_pushheaders>?, @CCall.CString name: String?): CPointer<ByteVar>? {
-    memScoped {
-        return interpretCPointer<ByteVar>(kniBridge60(h?.getPointer(memScope).rawValue, name?.cstr?.getPointer(memScope).rawValue))
-    }
-}
+@CCall("knifunptr_libcurl63_curl_pushheader_byname")
+external fun curl_pushheader_byname(h: CValuesRef<curl_pushheaders>?, @CCall.CString name: String?): CPointer<ByteVar>?
 
-fun curl_url(): CPointer<CURLU>? {
-    return interpretCPointer<CURLU>(kniBridge61())
-}
+val LIBCURL_COPYRIGHT: String get() = "1996 \u002D 2017 Daniel Stenberg, \u003Cdaniel@haxx.se\u003E."
 
-fun curl_url_cleanup(handle: CValuesRef<CURLU>?): Unit {
-    memScoped {
-        return kniBridge62(handle?.getPointer(memScope).rawValue)
-    }
-}
-
-fun curl_url_dup(`in`: CValuesRef<CURLU>?): CPointer<CURLU>? {
-    memScoped {
-        return interpretCPointer<CURLU>(kniBridge63(`in`?.getPointer(memScope).rawValue))
-    }
-}
-
-fun curl_url_get(handle: CValuesRef<CURLU>?, what: CURLUPart, part: CValuesRef<CPointerVar<ByteVar>>?, flags: UInt): CURLUcode {
-    memScoped {
-        return CURLUcode.byValue(kniBridge64(handle?.getPointer(memScope).rawValue, what.value, part?.getPointer(memScope).rawValue, flags))
-    }
-}
-
-fun curl_url_set(handle: CValuesRef<CURLU>?, what: CURLUPart, @CCall.CString part: String?, flags: UInt): CURLUcode {
-    memScoped {
-        return CURLUcode.byValue(kniBridge65(handle?.getPointer(memScope).rawValue, what.value, part?.cstr?.getPointer(memScope).rawValue, flags))
-    }
-}
-
-val LIBCURL_COPYRIGHT: String get() = "1996 \u002D 2019 Daniel Stenberg, \u003Cdaniel@haxx.se\u003E."
-
-val LIBCURL_VERSION: String get() = "7.66.0"
+val LIBCURL_VERSION: String get() = "7.58.0"
 
 const val LIBCURL_VERSION_MAJOR: Int = 7
 
-const val LIBCURL_VERSION_MINOR: Int = 66
+const val LIBCURL_VERSION_MINOR: Int = 58
 
 const val LIBCURL_VERSION_PATCH: Int = 0
 
-const val LIBCURL_VERSION_NUM: Int = 475648
+const val LIBCURL_VERSION_NUM: Int = 473600
 
-val LIBCURL_TIMESTAMP: String get() = "2019\u002D09\u002D11"
+val LIBCURL_TIMESTAMP: String get() = "2018\u002D01\u002D24"
 
 val CURL_FORMAT_CURL_OFF_T: String get() = "ld"
 
@@ -1359,8 +1089,6 @@ const val CURLSSLBACKEND_LIBRESSL: Int = 1
 const val CURLSSLBACKEND_BORINGSSL: Int = 1
 
 const val CURLSSLBACKEND_CYASSL: Int = 7
-
-const val CURLSSLBACKEND_DARWINSSL: Int = 9
 
 const val CURL_HTTPPOST_FILENAME: Int = 1
 
@@ -1428,10 +1156,6 @@ const val CURL_READFUNC_ABORT: Int = 268435456
 
 const val CURL_READFUNC_PAUSE: Int = 268435457
 
-const val CURL_TRAILERFUNC_OK: Int = 0
-
-const val CURL_TRAILERFUNC_ABORT: Int = 1
-
 const val CURL_SOCKOPT_OK: Int = 0
 
 const val CURL_SOCKOPT_ERROR: Int = 1
@@ -1448,11 +1172,9 @@ const val CURLOPT_ENCODING: Int = 10102
 
 const val CURLE_FTP_WEIRD_SERVER_REPLY: Int = 8
 
-const val CURLE_SSL_CACERT: Int = 60
-
 const val CURLE_UNKNOWN_TELNET_OPTION: Int = 48
 
-const val CURLE_SSL_PEER_CERTIFICATE: Int = 60
+const val CURLE_SSL_PEER_CERTIFICATE: Int = 51
 
 const val CURLE_OBSOLETE: Int = 50
 
@@ -1536,8 +1258,6 @@ const val CURLAUTH_DIGEST_IE: ULong = 16u
 
 const val CURLAUTH_NTLM_WB: ULong = 32u
 
-const val CURLAUTH_BEARER: ULong = 64u
-
 const val CURLAUTH_ONLY: ULong = 2147483648u
 
 const val CURLAUTH_ANY: ULong = 18446744073709551599u
@@ -1574,10 +1294,6 @@ const val CURLSSLOPT_ALLOW_BEAST: Int = 1
 
 const val CURLSSLOPT_NO_REVOKE: Int = 2
 
-const val CURL_HET_DEFAULT: Long = 200
-
-const val CURL_UPKEEP_INTERVAL_DEFAULT: Long = 60000
-
 const val CURLFTPSSL_NONE: Int = 0
 
 const val CURLFTPSSL_TRY: Int = 1
@@ -1591,16 +1307,6 @@ const val CURLFTPSSL_LAST: Int = 4
 const val CURLHEADER_UNIFIED: Int = 0
 
 const val CURLHEADER_SEPARATE: Int = 1
-
-const val CURLALTSVC_IMMEDIATELY: Int = 1
-
-const val CURLALTSVC_READONLYFILE: Int = 4
-
-const val CURLALTSVC_H1: Int = 8
-
-const val CURLALTSVC_H2: Int = 16
-
-const val CURLALTSVC_H3: Int = 32
 
 const val CURLPROTO_HTTP: Int = 1
 
@@ -1664,13 +1370,11 @@ const val CURLOPTTYPE_LONG: Int = 0
 
 const val CURLOPTTYPE_OBJECTPOINT: Int = 10000
 
+const val CURLOPTTYPE_STRINGPOINT: Int = 10000
+
 const val CURLOPTTYPE_FUNCTIONPOINT: Int = 20000
 
 const val CURLOPTTYPE_OFF_T: Int = 30000
-
-const val CURLOPTTYPE_STRINGPOINT: Int = 10000
-
-const val CURLOPTTYPE_SLISTPOINT: Int = 10000
 
 const val CURLOPT_XFERINFODATA: Int = 10057
 
@@ -1744,7 +1448,7 @@ const val CURL_GLOBAL_DEFAULT: Int = 3
 
 const val CURL_GLOBAL_ACK_EINTR: Int = 4
 
-const val CURLVERSION_NOW: Int = 5
+const val CURLVERSION_NOW: Int = 4
 
 const val CURL_VERSION_IPV6: Int = 1
 
@@ -1794,10 +1498,6 @@ const val CURL_VERSION_MULTI_SSL: Int = 4194304
 
 const val CURL_VERSION_BROTLI: Int = 8388608
 
-const val CURL_VERSION_ALTSVC: Int = 16777216
-
-const val CURL_VERSION_HTTP3: Int = 33554432
-
 const val CURLPAUSE_RECV: Int = 1
 
 const val CURLPAUSE_RECV_CONT: Int = 0
@@ -1846,26 +1546,6 @@ const val CURL_PUSH_OK: Int = 0
 
 const val CURL_PUSH_DENY: Int = 1
 
-const val CURLU_DEFAULT_PORT: Int = 1
-
-const val CURLU_NO_DEFAULT_PORT: Int = 2
-
-const val CURLU_DEFAULT_SCHEME: Int = 4
-
-const val CURLU_NON_SUPPORT_SCHEME: Int = 8
-
-const val CURLU_PATH_AS_IS: Int = 16
-
-const val CURLU_DISALLOW_USER: Int = 32
-
-const val CURLU_URLDECODE: Int = 64
-
-const val CURLU_URLENCODE: Int = 128
-
-const val CURLU_APPENDQUERY: Int = 256
-
-const val CURLU_GUESS_SCHEME: Int = 512
-
 typealias __socklen_tVar = UIntVarOf<__socklen_t>
 
 typealias __socklen_t = UInt
@@ -1898,10 +1578,6 @@ typealias curl_write_callbackVar = CPointerVarOf<curl_write_callback>
 
 typealias curl_write_callback = CPointer<CFunction<(CPointer<ByteVar>?, size_t, size_t, COpaquePointer?) -> size_t>>
 
-typealias curl_resolver_start_callbackVar = CPointerVarOf<curl_resolver_start_callback>
-
-typealias curl_resolver_start_callback = CPointer<CFunction<(COpaquePointer?, COpaquePointer?, COpaquePointer?) -> Int>>
-
 typealias __time_tVar = LongVarOf<__time_t>
 
 typealias __time_t = Long
@@ -1929,10 +1605,6 @@ typealias curl_seek_callback = CPointer<CFunction<(COpaquePointer?, curl_off_t, 
 typealias curl_read_callbackVar = CPointerVarOf<curl_read_callback>
 
 typealias curl_read_callback = CPointer<CFunction<(CPointer<ByteVar>?, size_t, size_t, COpaquePointer?) -> size_t>>
-
-typealias curl_trailer_callbackVar = CPointerVarOf<curl_trailer_callback>
-
-typealias curl_trailer_callback = CPointer<CFunction<(CPointer<CPointerVar<curl_slist>>?, COpaquePointer?) -> Int>>
 
 typealias curl_sockopt_callbackVar = CPointerVarOf<curl_sockopt_callback>
 
@@ -2022,8 +1694,6 @@ typealias curl_push_callbackVar = CPointerVarOf<curl_push_callback>
 
 typealias curl_push_callback = CPointer<CFunction<(COpaquePointer?, COpaquePointer?, size_t, CPointer<curl_pushheaders>?, COpaquePointer?) -> Int>>
 
-typealias CURLU = Curl_URL
-
 
 val CURLSSLBACKEND_NONE: curl_sslbackend get() = 0u
 
@@ -2043,13 +1713,11 @@ val CURLSSLBACKEND_WOLFSSL: curl_sslbackend get() = 7u
 
 val CURLSSLBACKEND_SCHANNEL: curl_sslbackend get() = 8u
 
-val CURLSSLBACKEND_SECURETRANSPORT: curl_sslbackend get() = 9u
+val CURLSSLBACKEND_DARWINSSL: curl_sslbackend get() = 9u
 
 val CURLSSLBACKEND_AXTLS: curl_sslbackend get() = 10u
 
 val CURLSSLBACKEND_MBEDTLS: curl_sslbackend get() = 11u
-
-val CURLSSLBACKEND_MESALINK: curl_sslbackend get() = 12u
 
 typealias curl_sslbackendVar = UIntVarOf<curl_sslbackend>
 
@@ -2202,7 +1870,7 @@ val CURLE_TELNET_OPTION_SYNTAX: CURLcode get() = 49u
 
 val CURLE_OBSOLETE50: CURLcode get() = 50u
 
-val CURLE_OBSOLETE51: CURLcode get() = 51u
+val CURLE_PEER_FAILED_VERIFICATION: CURLcode get() = 51u
 
 val CURLE_GOT_NOTHING: CURLcode get() = 52u
 
@@ -2220,7 +1888,7 @@ val CURLE_SSL_CERTPROBLEM: CURLcode get() = 58u
 
 val CURLE_SSL_CIPHER: CURLcode get() = 59u
 
-val CURLE_PEER_FAILED_VERIFICATION: CURLcode get() = 60u
+val CURLE_SSL_CACERT: CURLcode get() = 60u
 
 val CURLE_BAD_CONTENT_ENCODING: CURLcode get() = 61u
 
@@ -2286,11 +1954,7 @@ val CURLE_SSL_INVALIDCERTSTATUS: CURLcode get() = 91u
 
 val CURLE_HTTP2_STREAM: CURLcode get() = 92u
 
-val CURLE_RECURSIVE_API_CALL: CURLcode get() = 93u
-
-val CURLE_AUTH_ERROR: CURLcode get() = 94u
-
-val CURL_LAST: CURLcode get() = 95u
+val CURL_LAST: CURLcode get() = 93u
 
 typealias CURLcodeVar = UIntVarOf<CURLcode>
 
@@ -2818,53 +2482,13 @@ val CURLOPT_SSH_COMPRESSION: CURLoption get() = 268u
 
 val CURLOPT_MIMEPOST: CURLoption get() = 10269u
 
-val CURLOPT_TIMEVALUE_LARGE: CURLoption get() = 30270u
-
-val CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS: CURLoption get() = 271u
-
-val CURLOPT_RESOLVER_START_FUNCTION: CURLoption get() = 20272u
-
-val CURLOPT_RESOLVER_START_DATA: CURLoption get() = 10273u
-
-val CURLOPT_HAPROXYPROTOCOL: CURLoption get() = 274u
-
-val CURLOPT_DNS_SHUFFLE_ADDRESSES: CURLoption get() = 275u
-
-val CURLOPT_TLS13_CIPHERS: CURLoption get() = 10276u
-
-val CURLOPT_PROXY_TLS13_CIPHERS: CURLoption get() = 10277u
-
-val CURLOPT_DISALLOW_USERNAME_IN_URL: CURLoption get() = 278u
-
-val CURLOPT_DOH_URL: CURLoption get() = 10279u
-
-val CURLOPT_UPLOAD_BUFFERSIZE: CURLoption get() = 280u
-
-val CURLOPT_UPKEEP_INTERVAL_MS: CURLoption get() = 281u
-
-val CURLOPT_CURLU: CURLoption get() = 10282u
-
-val CURLOPT_TRAILERFUNCTION: CURLoption get() = 20283u
-
-val CURLOPT_TRAILERDATA: CURLoption get() = 10284u
-
-val CURLOPT_HTTP09_ALLOWED: CURLoption get() = 285u
-
-val CURLOPT_ALTSVC_CTRL: CURLoption get() = 286u
-
-val CURLOPT_ALTSVC: CURLoption get() = 10287u
-
-val CURLOPT_MAXAGE_CONN: CURLoption get() = 288u
-
-val CURLOPT_SASL_AUTHZID: CURLoption get() = 10289u
-
-val CURLOPT_LASTENTRY: CURLoption get() = 10290u
+val CURLOPT_LASTENTRY: CURLoption get() = 10270u
 
 typealias CURLoptionVar = UIntVarOf<CURLoption>
 
 typealias CURLoption = UInt
 
-// enum (anonymous at /usr/include/curl/curl.h:1973:1):
+// enum (anonymous at /usr/include/x86_64-linux-gnu/curl/curl.h:1865:1):
 
 val CURL_HTTP_VERSION_NONE: UInt get() = 0u
 
@@ -2878,11 +2502,9 @@ val CURL_HTTP_VERSION_2TLS: UInt get() = 4u
 
 val CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE: UInt get() = 5u
 
-val CURL_HTTP_VERSION_3: UInt get() = 30u
+val CURL_HTTP_VERSION_LAST: UInt get() = 6u
 
-val CURL_HTTP_VERSION_LAST: UInt get() = 31u
-
-// enum (anonymous at /usr/include/curl/curl.h:1996:1):
+// enum (anonymous at /usr/include/x86_64-linux-gnu/curl/curl.h:1887:1):
 
 val CURL_RTSPREQ_NONE: UInt get() = 0u
 
@@ -2910,7 +2532,7 @@ val CURL_RTSPREQ_RECEIVE: UInt get() = 11u
 
 val CURL_RTSPREQ_LAST: UInt get() = 12u
 
-// enum (anonymous at /usr/include/curl/curl.h:2024:1):
+// enum (anonymous at /usr/include/x86_64-linux-gnu/curl/curl.h:1915:1):
 
 val CURL_SSLVERSION_DEFAULT: UInt get() = 0u
 
@@ -2930,7 +2552,7 @@ val CURL_SSLVERSION_TLSv1_3: UInt get() = 7u
 
 val CURL_SSLVERSION_LAST: UInt get() = 8u
 
-// enum (anonymous at /usr/include/curl/curl.h:2037:1):
+// enum (anonymous at /usr/include/x86_64-linux-gnu/curl/curl.h:1928:1):
 
 val CURL_SSLVERSION_MAX_NONE: UInt get() = 0u
 
@@ -2997,8 +2619,6 @@ val CURLINFO_REQUEST_SIZE: CURLINFO get() = 2097164u
 val CURLINFO_SSL_VERIFYRESULT: CURLINFO get() = 2097165u
 
 val CURLINFO_FILETIME: CURLINFO get() = 2097166u
-
-val CURLINFO_FILETIME_T: CURLINFO get() = 6291470u
 
 val CURLINFO_CONTENT_LENGTH_DOWNLOAD: CURLINFO get() = 3145743u
 
@@ -3074,23 +2694,7 @@ val CURLINFO_PROTOCOL: CURLINFO get() = 2097200u
 
 val CURLINFO_SCHEME: CURLINFO get() = 1048625u
 
-val CURLINFO_TOTAL_TIME_T: CURLINFO get() = 6291506u
-
-val CURLINFO_NAMELOOKUP_TIME_T: CURLINFO get() = 6291507u
-
-val CURLINFO_CONNECT_TIME_T: CURLINFO get() = 6291508u
-
-val CURLINFO_PRETRANSFER_TIME_T: CURLINFO get() = 6291509u
-
-val CURLINFO_STARTTRANSFER_TIME_T: CURLINFO get() = 6291510u
-
-val CURLINFO_REDIRECT_TIME_T: CURLINFO get() = 6291511u
-
-val CURLINFO_APPCONNECT_TIME_T: CURLINFO get() = 6291512u
-
-val CURLINFO_RETRY_AFTER: CURLINFO get() = 6291513u
-
-val CURLINFO_LASTONE: CURLINFO get() = 57u
+val CURLINFO_LASTONE: CURLINFO get() = 49u
 
 typealias CURLINFOVar = UIntVarOf<CURLINFO>
 
@@ -3109,9 +2713,7 @@ val CURL_LOCK_DATA_SSL_SESSION: curl_lock_data get() = 4u
 
 val CURL_LOCK_DATA_CONNECT: curl_lock_data get() = 5u
 
-val CURL_LOCK_DATA_PSL: curl_lock_data get() = 6u
-
-val CURL_LOCK_DATA_LAST: curl_lock_data get() = 7u
+val CURL_LOCK_DATA_LAST: curl_lock_data get() = 6u
 
 typealias curl_lock_dataVar = UIntVarOf<curl_lock_data>
 
@@ -3149,9 +2751,7 @@ val CURLM_UNKNOWN_OPTION: CURLMcode get() = 6
 
 val CURLM_ADDED_ALREADY: CURLMcode get() = 7
 
-val CURLM_RECURSIVE_API_CALL: CURLMcode get() = 8
-
-val CURLM_LAST: CURLMcode get() = 9
+val CURLM_LAST: CURLMcode get() = 8
 
 typealias CURLMcodeVar = IntVarOf<CURLMcode>
 
@@ -3193,135 +2793,3 @@ val CURLMOPT_LASTENTRY: CURLMoption get() = 10016u
 typealias CURLMoptionVar = UIntVarOf<CURLMoption>
 
 typealias CURLMoption = UInt
-@SymbolName("libcurl_kniBridge0")
-private external fun kniBridge0(p0: NativePtr, p1: NativePtr): Int
-@SymbolName("libcurl_kniBridge1")
-private external fun kniBridge1(p0: NativePtr, p1: NativePtr, p2: ULong): Int
-@SymbolName("libcurl_kniBridge2")
-private external fun kniBridge2(p0: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge3")
-private external fun kniBridge3(p0: NativePtr): Unit
-@SymbolName("libcurl_kniBridge4")
-private external fun kniBridge4(p0: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge5")
-private external fun kniBridge5(p0: NativePtr, p1: NativePtr): UInt
-@SymbolName("libcurl_kniBridge6")
-private external fun kniBridge6(p0: NativePtr, p1: NativePtr): UInt
-@SymbolName("libcurl_kniBridge7")
-private external fun kniBridge7(p0: NativePtr, p1: NativePtr): UInt
-@SymbolName("libcurl_kniBridge8")
-private external fun kniBridge8(p0: NativePtr, p1: NativePtr): UInt
-@SymbolName("libcurl_kniBridge9")
-private external fun kniBridge9(p0: NativePtr, p1: NativePtr, p2: ULong): UInt
-@SymbolName("libcurl_kniBridge10")
-private external fun kniBridge10(p0: NativePtr, p1: NativePtr): UInt
-@SymbolName("libcurl_kniBridge11")
-private external fun kniBridge11(p0: NativePtr, p1: Long, p2: NativePtr, p3: NativePtr, p4: NativePtr, p5: NativePtr): UInt
-@SymbolName("libcurl_kniBridge12")
-private external fun kniBridge12(p0: NativePtr, p1: NativePtr): UInt
-@SymbolName("libcurl_kniBridge13")
-private external fun kniBridge13(p0: NativePtr, p1: NativePtr, p2: Int): UInt
-@SymbolName("libcurl_kniBridge14")
-private external fun kniBridge14(p0: NativePtr, p1: NativePtr, p2: NativePtr): Int
-@SymbolName("libcurl_kniBridge15")
-private external fun kniBridge15(p0: NativePtr): Unit
-@SymbolName("libcurl_kniBridge16")
-private external fun kniBridge16(p0: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge17")
-private external fun kniBridge17(): NativePtr
-@SymbolName("libcurl_kniBridge18")
-private external fun kniBridge18(p0: NativePtr, p1: NativePtr, p2: Int): NativePtr
-@SymbolName("libcurl_kniBridge19")
-private external fun kniBridge19(p0: NativePtr, p1: Int): NativePtr
-@SymbolName("libcurl_kniBridge20")
-private external fun kniBridge20(p0: NativePtr, p1: NativePtr, p2: Int, p3: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge21")
-private external fun kniBridge21(p0: NativePtr, p1: Int): NativePtr
-@SymbolName("libcurl_kniBridge22")
-private external fun kniBridge22(p0: NativePtr): Unit
-@SymbolName("libcurl_kniBridge23")
-private external fun kniBridge23(p0: Long): UInt
-@SymbolName("libcurl_kniBridge24")
-private external fun kniBridge24(p0: Long, p1: NativePtr, p2: NativePtr, p3: NativePtr, p4: NativePtr, p5: NativePtr): UInt
-@SymbolName("libcurl_kniBridge25")
-private external fun kniBridge25(): Unit
-@SymbolName("libcurl_kniBridge26")
-private external fun kniBridge26(p0: UInt, p1: NativePtr, p2: NativePtr): UInt
-@SymbolName("libcurl_kniBridge27")
-private external fun kniBridge27(p0: NativePtr, p1: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge28")
-private external fun kniBridge28(p0: NativePtr): Unit
-@SymbolName("libcurl_kniBridge29")
-private external fun kniBridge29(p0: NativePtr, p1: NativePtr): Long
-@SymbolName("libcurl_kniBridge30")
-private external fun kniBridge30(): NativePtr
-@SymbolName("libcurl_kniBridge31")
-private external fun kniBridge31(p0: NativePtr): UInt
-@SymbolName("libcurl_kniBridge32")
-private external fun kniBridge32(p0: UInt): NativePtr
-@SymbolName("libcurl_kniBridge33")
-private external fun kniBridge33(p0: UInt): NativePtr
-@SymbolName("libcurl_kniBridge34")
-private external fun kniBridge34(p0: UInt): NativePtr
-@SymbolName("libcurl_kniBridge35")
-private external fun kniBridge35(p0: NativePtr, p1: Int): UInt
-@SymbolName("libcurl_kniBridge36")
-private external fun kniBridge36(): NativePtr
-@SymbolName("libcurl_kniBridge37")
-private external fun kniBridge37(p0: NativePtr): UInt
-@SymbolName("libcurl_kniBridge38")
-private external fun kniBridge38(p0: NativePtr): Unit
-@SymbolName("libcurl_kniBridge39")
-private external fun kniBridge39(p0: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge40")
-private external fun kniBridge40(p0: NativePtr): Unit
-@SymbolName("libcurl_kniBridge41")
-private external fun kniBridge41(p0: NativePtr, p1: NativePtr, p2: ULong, p3: NativePtr): UInt
-@SymbolName("libcurl_kniBridge42")
-private external fun kniBridge42(p0: NativePtr, p1: NativePtr, p2: ULong, p3: NativePtr): UInt
-@SymbolName("libcurl_kniBridge43")
-private external fun kniBridge43(p0: NativePtr): UInt
-@SymbolName("libcurl_kniBridge44")
-private external fun kniBridge44(): NativePtr
-@SymbolName("libcurl_kniBridge45")
-private external fun kniBridge45(p0: NativePtr, p1: NativePtr): Int
-@SymbolName("libcurl_kniBridge46")
-private external fun kniBridge46(p0: NativePtr, p1: NativePtr): Int
-@SymbolName("libcurl_kniBridge47")
-private external fun kniBridge47(p0: NativePtr, p1: NativePtr, p2: NativePtr, p3: NativePtr, p4: NativePtr): Int
-@SymbolName("libcurl_kniBridge48")
-private external fun kniBridge48(p0: NativePtr, p1: NativePtr, p2: UInt, p3: Int, p4: NativePtr): Int
-@SymbolName("libcurl_kniBridge49")
-private external fun kniBridge49(p0: NativePtr, p1: NativePtr, p2: UInt, p3: Int, p4: NativePtr): Int
-@SymbolName("libcurl_kniBridge50")
-private external fun kniBridge50(p0: NativePtr, p1: NativePtr): Int
-@SymbolName("libcurl_kniBridge51")
-private external fun kniBridge51(p0: NativePtr): Int
-@SymbolName("libcurl_kniBridge52")
-private external fun kniBridge52(p0: NativePtr, p1: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge53")
-private external fun kniBridge53(p0: Int): NativePtr
-@SymbolName("libcurl_kniBridge54")
-private external fun kniBridge54(p0: NativePtr, p1: Int, p2: NativePtr): Int
-@SymbolName("libcurl_kniBridge55")
-private external fun kniBridge55(p0: NativePtr, p1: Int, p2: Int, p3: NativePtr): Int
-@SymbolName("libcurl_kniBridge56")
-private external fun kniBridge56(p0: NativePtr, p1: NativePtr): Int
-@SymbolName("libcurl_kniBridge57")
-private external fun kniBridge57(p0: NativePtr, p1: NativePtr): Int
-@SymbolName("libcurl_kniBridge58")
-private external fun kniBridge58(p0: NativePtr, p1: Int, p2: NativePtr): Int
-@SymbolName("libcurl_kniBridge59")
-private external fun kniBridge59(p0: NativePtr, p1: ULong): NativePtr
-@SymbolName("libcurl_kniBridge60")
-private external fun kniBridge60(p0: NativePtr, p1: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge61")
-private external fun kniBridge61(): NativePtr
-@SymbolName("libcurl_kniBridge62")
-private external fun kniBridge62(p0: NativePtr): Unit
-@SymbolName("libcurl_kniBridge63")
-private external fun kniBridge63(p0: NativePtr): NativePtr
-@SymbolName("libcurl_kniBridge64")
-private external fun kniBridge64(p0: NativePtr, p1: UInt, p2: NativePtr, p3: UInt): UInt
-@SymbolName("libcurl_kniBridge65")
-private external fun kniBridge65(p0: NativePtr, p1: UInt, p2: NativePtr, p3: UInt): UInt

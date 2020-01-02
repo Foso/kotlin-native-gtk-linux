@@ -137,7 +137,7 @@ fun gtkMain(args: Array<String>): Int {
 
 fun main(args: Array<String>) {
     glibresources_get_resource()
-    //main2(args)
+   // main2(args)
 
     memScoped {
         val argc = alloc<IntVar>()
